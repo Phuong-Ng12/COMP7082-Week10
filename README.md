@@ -26,3 +26,13 @@ python demo.py
 ```
 
 Use temporary databases and fake payment tokens for unit tests. No real payment credentials are required.
+
+# Successful GitHub Actions run
+
+Tests run automatically with GitHub Actions on every push and pull request (`.github/workflows/tests.yml`).
+
+### Workflow runs (push and pull request triggers)
+![GitHub Actions workflow runs](screenshot/CIworkflow.png)
+
+### Test output from a run
+![pytest output in GitHub Actions](screenshot/CIworkflow_2.png)

@@ -116,3 +116,13 @@
 - **Impact:** a retry, double click or network replay double charges the customer.
 - **Fix:** require request_id. If an order with that ID already exists, return the existing result without charging again. Add UNIQUE to request_id.
 - **Test:** duplicate request_id does not charge twice. Checkout without request_id is rejected
+
+# Reliability and Design
+## 13. load() duplicates quantities
+- **Location:** cart.py, load
+- **Cause:** saved lines are merged into the existing in-memory lines through add_item
+- **Reproduce:** add 2 USB cables, save(), then load()
+- **Observed:** the quantity is 4
+- **Impact:** customer is overcharged, cart and database disagree
+- **Fix:** load() now clears self.lines before re-adding the saved lines, so it replaces the in-memory cart instead of merging into it. Since "Stock check ignores quantity already in the cart" was fixed, merging would also have made add_item reject some saved lines for exceeding stock, leaving a partial cart, clearing first avoids that too.
+- **Test:** load does not duplicate quantities (add 2 USB cables, saves, loads, assert 1 line with quantity 2), load restores saved cart into new cart (a fresh ShoppingCart for the same user gets the saved line back)

@@ -87,3 +87,21 @@ def test_save15_stops_applying_if_items_removed_below_minimum(tmp_path):
     cart.apply_discount('SAVE15')
     cart.remove_item('MOU-01')                      # now 9.99
     assert cart.total() == pytest.approx(9.99)
+
+# Verify Correcting Defect 13. load() duplicates quantities
+def test_load_does_not_duplicate_quantities(tmp_path):
+    cart = make_cart(tmp_path)
+    cart.add_item('USB-01', 2)
+    cart.save()
+    cart.load()
+    assert len(cart.lines) == 1
+    assert cart.lines[0].quantity == 2
+
+# Verify Correcting Defect 13. load() duplicates quantities
+def test_load_restores_saved_cart_into_new_cart(tmp_path):
+    cart = make_cart(tmp_path)
+    cart.add_item('USB-01', 2)
+    cart.save()
+    fresh = ShoppingCart('student', cart.repository)
+    fresh.load()
+    assert [(l.sku, l.quantity) for l in fresh.lines] == [('USB-01', 2)]
